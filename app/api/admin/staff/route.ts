@@ -11,7 +11,31 @@ import {
 import { generateAccessCode } from "@/lib/access-code";
 
 function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (email.length > 254) {
+    return false;
+  }
+
+  const parts = email.split("@");
+
+  if (parts.length !== 2) {
+    return false;
+  }
+
+  const [local, domain] = parts;
+
+  if (!local || local.length > 64 || !domain || domain.length > 253) {
+    return false;
+  }
+
+  const domainLabels = domain.split(".");
+
+  if (domainLabels.length < 2) {
+    return false;
+  }
+
+  return domainLabels.every(
+    (label) => label.length > 0 && label.length <= 63 && /^[a-zA-Z0-9-]+$/.test(label),
+  );
 }
 
 /**
