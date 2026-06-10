@@ -7,6 +7,8 @@ const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
 type SessionPayload = {
   userId: string;
   email: string;
+  role: string;
+  organizationId: string | null;
   exp: number;
 };
 
@@ -57,7 +59,7 @@ export function decodeSession(token: string): SessionPayload | null {
       Buffer.from(rawPayload, "base64url").toString("utf8"),
     ) as SessionPayload;
 
-    if (!payload.userId || !payload.email || !payload.exp) {
+    if (!payload.userId || !payload.email || !payload.role || !payload.exp) {
       return null;
     }
 
@@ -71,10 +73,12 @@ export function decodeSession(token: string): SessionPayload | null {
   }
 }
 
-export async function createUserSession(userId: string, email: string) {
+export async function createUserSession(userId: string, email: string, role: string, organizationId: string | null) {
   const token = encodeSession({
     userId,
     email,
+    role,
+    organizationId,
     exp: Date.now() + SESSION_MAX_AGE_SECONDS * 1000,
   });
 
