@@ -24,13 +24,17 @@ export default function LoginPage() {
         body: JSON.stringify({ email, accessCode }),
       });
 
-      const data = (await response.json()) as { error?: string };
+      const data = (await response.json()) as { error?: string; role?: string };
 
       if (!response.ok) {
         throw new Error(data.error || "Unable to sign in.");
       }
 
-      router.push("/app");
+      if (data.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/app");
+      }
       router.refresh();
     } catch (requestError) {
       setError(

@@ -29,9 +29,16 @@ export async function POST(request: Request) {
       );
     }
 
-    await createUserSession(user.id, user.email);
+    if (!user.is_active) {
+      return NextResponse.json(
+        { error: "This account has been deactivated. Please contact your administrator." },
+        { status: 403 },
+      );
+    }
 
-    return NextResponse.json({ success: true });
+    await createUserSession(user.id, user.email, user.role, user.organization_id);
+
+    return NextResponse.json({ success: true, role: user.role });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
